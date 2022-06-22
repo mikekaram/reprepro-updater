@@ -8,6 +8,7 @@ import os
 import shutil
 import sys
 
+from filelock import FileLock
 from reprepro_updater.changes_parsing import find_changes_files
 from reprepro_updater.changes_parsing import load_changes_files
 from reprepro_updater.helpers import delete_unreferenced
@@ -15,7 +16,6 @@ from reprepro_updater.helpers import invalidate_dependent
 from reprepro_updater.helpers import invalidate_package
 from reprepro_updater.helpers import LockContext
 from reprepro_updater.helpers import run_include_command
-
 
 def rename_ddeb_files_in_changes_file(filename):
     """ Rename ddeb files listed in changes file
@@ -105,7 +105,7 @@ if extraneous_packages:
 lockfile = os.path.join(options.repo_path, 'lock')
 
 if options.commit:
-    with LockContext(lockfile) as lock_c:
+    with FileLock(lockfile) as lock_c:
 
         # invalidate and clear all first
 
