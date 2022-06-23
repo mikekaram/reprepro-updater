@@ -7,7 +7,7 @@ import sys
 
 from reprepro_updater import conf
 from reprepro_updater.helpers import LockContext
-from filelock import FileLock
+import portalocker
 
 parser = OptionParser()
 
@@ -47,7 +47,7 @@ inc = conf.IncomingFile(conf_params.distros)
 export_command = ['reprepro', '-v', '-b',
                   conf_params.repository_path, 'export']
 
-with FileLock(conf_params.lockfile) as lock_c:
+with portalocker.Lock(conf_params.lockfile, timeout=30) as lock_c:
     print("I have a lock on %s" % conf_params.lockfile)
 
     # write out distributions file

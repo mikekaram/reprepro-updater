@@ -8,7 +8,7 @@ import os
 import shutil
 import sys
 
-from filelock import FileLock
+import portalocker
 from reprepro_updater.changes_parsing import find_changes_files
 from reprepro_updater.changes_parsing import load_changes_files
 from reprepro_updater.helpers import delete_unreferenced
@@ -105,7 +105,7 @@ if extraneous_packages:
 lockfile = os.path.join(options.repo_path, 'lock')
 
 if options.commit:
-    with FileLock(lockfile) as lock_c:
+    with portalocker.Lock(lockfile, timeout=30) as lock_c:
 
         # invalidate and clear all first
 

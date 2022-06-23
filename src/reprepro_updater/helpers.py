@@ -5,7 +5,7 @@ import os
 import subprocess
 import sys
 import time
-from filelock import FileLock
+import portalocker
 from reprepro_updater.repository_info import RepositoryInfo
 
 
@@ -149,7 +149,7 @@ def _clear_ros_distro(repo_dir, rosdistro, distro, arch, commit):
 def run_cleanup(repo_dir, rosdistro, distro, arch, commit):
 
     lockfile = os.path.join(repo_dir, 'lock')
-    with FileLock(lockfile) as lock_c:
+    with portalocker.Lock(lockfile, timeout=30) as lock_c:
 
         if not _clear_ros_distro(repo_dir, rosdistro, distro, arch, commit):
             raise RuntimeError('cleanup command failed')
@@ -165,7 +165,7 @@ def run_update(repo_dir, dist_generator, updates_generator,
     update_filename = os.path.join(conf_dir, 'updates')
     distributions_filename = os.path.join(conf_dir, 'distributions')
 
-    with FileLock(lockfile) as lock_c:
+    with portalocker.Lock(lockfile, timeout=30) as lock_c:
         print("I have a lock on %s" % lockfile)
 
         # write out update file
