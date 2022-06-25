@@ -5,7 +5,8 @@ import os
 import subprocess
 import sys
 import time
-import portalocker
+from flufl.lock import Lock
+from datetime import timedelta
 from reprepro_updater.repository_info import RepositoryInfo
 
 
@@ -149,12 +150,13 @@ def _clear_ros_distro(repo_dir, rosdistro, distro, arch, commit):
 def run_cleanup(repo_dir, rosdistro, distro, arch, commit):
 
     lockfile = os.path.join(repo_dir, 'lock')
-    with portalocker.Lock(lockfile, timeout=30) as lock_c:
-
+    lock = Lock(lockfile, lifetime=timedelta(seconds=30))
+    with lock as lock_c:
         if not _clear_ros_distro(repo_dir, rosdistro, distro, arch, commit):
             raise RuntimeError('cleanup command failed')
         if not delete_unreferenced(repo_dir, commit):
             raise RuntimeError('delete_unreferenced command failed')
+        lock_c.unlock()
 
 
 def run_update(repo_dir, dist_generator, updates_generator,
@@ -165,7 +167,9 @@ def run_update(repo_dir, dist_generator, updates_generator,
     update_filename = os.path.join(conf_dir, 'updates')
     distributions_filename = os.path.join(conf_dir, 'distributions')
 
-    with portalocker.Lock(lockfile, timeout=30) as lock_c:
+    # we expect this to take at most 60 minutes
+    lock = Lock(lockfile, lifetime = timedelta(minutes=60))
+    with lock as lock_c:
         print("I have a lock on %s" % lockfile)
 
         # write out update file
@@ -183,3 +187,4 @@ def run_update(repo_dir, dist_generator, updates_generator,
 
         if not _run_update_command(repo_dir, distro, commit):
             raise RuntimeError('update command failed')
+        lock_c.unlock()

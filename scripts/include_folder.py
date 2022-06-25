@@ -8,7 +8,8 @@ import os
 import shutil
 import sys
 
-import portalocker
+from flufl.lock import Lock
+from datetime import timedelta
 from reprepro_updater.changes_parsing import find_changes_files
 from reprepro_updater.changes_parsing import load_changes_files
 from reprepro_updater.helpers import delete_unreferenced
@@ -105,7 +106,8 @@ if extraneous_packages:
 lockfile = os.path.join(options.repo_path, 'lock')
 
 if options.commit:
-    with portalocker.Lock(lockfile, timeout=30) as lock_c:
+    lock = Lock(lockfile, lifetime=timedelta(seconds=30))
+    with lock as lock_c:
 
         # invalidate and clear all first
 
@@ -147,6 +149,7 @@ if options.commit:
             if options.do_delete:
                 print("Removing %s" % changes.folder)
                 shutil.rmtree(changes.folder)
+        lock_c.unlock()
 
 else:
     print("NO COMMIT OPTION\nWould have run invalidation of"

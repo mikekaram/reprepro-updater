@@ -7,7 +7,8 @@ import sys
 
 from reprepro_updater import conf
 from reprepro_updater.helpers import LockContext
-import portalocker
+from flufl.lock import Lock
+from datetime import timedelta
 
 parser = OptionParser()
 
@@ -47,7 +48,8 @@ inc = conf.IncomingFile(conf_params.distros)
 export_command = ['reprepro', '-v', '-b',
                   conf_params.repository_path, 'export']
 
-with portalocker.Lock(conf_params.lockfile, timeout=30) as lock_c:
+lock = Lock(conf_params.lockfile, lifetime=timedelta(minutes=5))
+with lock as lock_c:
     print("I have a lock on %s" % conf_params.lockfile)
 
     # write out distributions file
@@ -69,3 +71,4 @@ with portalocker.Lock(conf_params.lockfile, timeout=30) as lock_c:
     else:
         print("Not running command due to no --commit option")
         print("[%s]" % (export_command))
+    lock_c.unlock()
