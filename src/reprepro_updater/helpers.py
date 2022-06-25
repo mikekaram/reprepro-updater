@@ -166,8 +166,8 @@ def run_update(repo_dir, dist_generator, updates_generator,
     update_filename = os.path.join(conf_dir, 'updates')
     distributions_filename = os.path.join(conf_dir, 'distributions')
 
-    # we expect this to take at most 60 minutes
-    lock = Lock(lockfile, lifetime = timedelta(minutes=60))
+    # we expect this to take at most 30 seconds per each package
+    lock = Lock(lockfile, lifetime = timedelta(seconds=30))
     with lock as lock_c:
         print("I have a lock on %s" % lockfile)
 
