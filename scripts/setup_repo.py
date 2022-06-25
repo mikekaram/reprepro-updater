@@ -71,4 +71,3 @@ with lock as lock_c:
     else:
         print("Not running command due to no --commit option")
         print("[%s]" % (export_command))
-    lock_c.unlock()

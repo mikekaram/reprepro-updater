@@ -156,7 +156,6 @@ def run_cleanup(repo_dir, rosdistro, distro, arch, commit):
             raise RuntimeError('cleanup command failed')
         if not delete_unreferenced(repo_dir, commit):
             raise RuntimeError('delete_unreferenced command failed')
-        lock_c.unlock()
 
 
 def run_update(repo_dir, dist_generator, updates_generator,
@@ -187,4 +186,3 @@ def run_update(repo_dir, dist_generator, updates_generator,
 
         if not _run_update_command(repo_dir, distro, commit):
             raise RuntimeError('update command failed')
-        lock_c.unlock()

@@ -149,7 +149,6 @@ if options.commit:
             if options.do_delete:
                 print("Removing %s" % changes.folder)
                 shutil.rmtree(changes.folder)
-        lock_c.unlock()
 
 else:
     print("NO COMMIT OPTION\nWould have run invalidation of"
