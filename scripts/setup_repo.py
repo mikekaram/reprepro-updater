@@ -48,7 +48,7 @@ inc = conf.IncomingFile(conf_params.distros)
 export_command = ['reprepro', '-v', '-b',
                   conf_params.repository_path, 'export']
 
-lock = Lock(conf_params.lockfile, lifetime=timedelta(minutes=5))
+lock = Lock(conf_params.lockfile, lifetime=timedelta(seconds=30))
 with lock as lock_c:
     print("I have a lock on %s" % conf_params.lockfile)
 
